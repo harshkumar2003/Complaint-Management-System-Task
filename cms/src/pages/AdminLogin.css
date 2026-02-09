@@ -1,0 +1,283 @@
+/* ===============================
+   PAGE WRAPPER
+================================ */
+.login-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f3f4f6;
+  padding: 20px;
+}
+
+/* ===============================
+   LOGIN CARD
+================================ */
+.login-card {
+  background-color: #ffffff;
+  width: 100%;
+  max-width: 440px;
+  padding: 44px 40px;
+  border-radius: 20px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 16px 42px rgba(0, 0, 0, 0.1);
+  color: var(--text-main);
+}
+
+/* ===============================
+   HEADER
+================================ */
+.login-header {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.login-header h2 {
+  margin: 12px 0 8px 0;
+  font-size: 26px;
+  font-weight: 600;
+}
+
+.login-header p {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ===============================
+   ROLE BADGE (ADMIN)
+================================ */
+.admin-login-wrapper .role-badge {
+  display: inline-block;
+  padding: 6px 16px;
+  border-radius: 20px;
+  background-color: var(--dark) !important;
+  color: white !important;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+/* ===============================
+   MESSAGES
+================================ */
+.error-message {
+  background-color: #fef2f2;
+  color: var(--error);
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.success-message {
+  background-color: #f0fdf4;
+  color: var(--success);
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+/* ===============================
+   FORM
+================================ */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.input-group {
+  position: relative;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 14px 16px;
+  font-size: 14px;
+  border-radius: 8px;
+  border: 1.5px solid #d1d5db;
+  background-color: #ffffff;
+  color: var(--text-main);
+}
+
+.input-group input::placeholder {
+  color: var(--text-muted);
+}
+
+.admin-login-wrapper .input-group input:focus {
+  outline: none;
+  border-color: var(--dark) !important;
+  box-shadow: 0 0 0 3px rgba(31, 41, 55, 0.18) !important;
+}
+
+/* ===============================
+   PASSWORD TOGGLE
+================================ */
+.admin-login-wrapper .password-toggle {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border-radius: 8px;
+  border: none;
+  background-color: transparent;
+  color: var(--dark) !important;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.admin-login-wrapper .password-toggle:hover {
+  background-color: rgba(31, 41, 55, 0.1);
+}
+
+/* ===============================
+   TROUBLE LINK
+================================ */
+.trouble-link {
+  margin-top: -6px;
+  text-align: left;
+}
+
+.trouble-link a {
+  font-size: 13px;
+  color: var(--text-muted);
+  text-decoration: none;
+}
+
+.trouble-link a:hover {
+  color: var(--text-main);
+}
+
+/* ===============================
+   SUBMIT BUTTON (ADMIN)
+================================ */
+.admin-login-wrapper .submit-button {
+  margin-top: 6px;
+  padding: 14px;
+  border-radius: 8px;
+  border: none;
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.admin-login-wrapper .submit-button:hover {
+  background-color: #0a0a0a !important;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.45);
+  transform: translateY(-2px);
+}
+
+.admin-login-wrapper .submit-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Stronger override in case global button rules take precedence */
+.admin-login-wrapper .login-card .submit-button {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  border: none !important;
+  background-image: none !important;
+  -webkit-appearance: none !important;
+  appearance: none !important;
+}
+
+/* ===============================
+   DIVIDER
+================================ */
+.divider {
+  margin: 26px 0 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.divider::before,
+.divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background-color: #d1d5db;
+}
+
+/* ===============================
+   SOCIAL LOGIN
+================================ */
+.social-login {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+
+.social-button {
+  flex: 1;
+  min-width: 120px;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1.5px solid #d1d5db;
+  background-color: #111827;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.social-button svg {
+  flex-shrink: 0;
+}
+
+/* ===============================
+   SIGNUP & BACK LINKS
+================================ */
+.admin-login-wrapper .signup-link {
+  margin-top: 22px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.admin-login-wrapper .signup-link a {
+  color: var(--text-main);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.admin-login-wrapper .signup-link a:hover {
+  color: var(--dark) !important;
+  text-decoration: underline;
+}
+
+.admin-login-wrapper .back-link {
+  margin-top: 16px;
+  text-align: center;
+}
+
+.admin-login-wrapper .back-link a {
+  font-size: 14px;
+  color: var(--text-muted);
+  text-decoration: none;
+}
+
+.admin-login-wrapper .back-link a:hover {
+  color: var(--dark) !important;
+}
