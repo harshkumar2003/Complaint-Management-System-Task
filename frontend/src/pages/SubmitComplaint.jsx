@@ -7,7 +7,6 @@ export default function SubmitComplaint() {
   const navigate = useNavigate();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [category, setCategory] = useState("General");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -21,7 +20,6 @@ export default function SubmitComplaint() {
       const res = await createComplaint({
         title,
         description,
-        category,
       });
 
       // stop loading and show success
@@ -30,7 +28,6 @@ export default function SubmitComplaint() {
       // clear form
       setTitle("");
       setDescription("");
-      setCategory("General");
 
       // Redirect to complaints page after 1.5 seconds
       setTimeout(() => {
@@ -50,14 +47,6 @@ export default function SubmitComplaint() {
       setLoading(false);
     }
   };
-
-  const categoryOptions = [
-    { value: "General", icon: "📋", description: "General inquiries and issues" },
-    { value: "Infrastructure", icon: "🏗️", description: "Buildings, facilities, equipment" },
-    { value: "Academics", icon: "📚", description: "Courses, exams, teaching" },
-    { value: "Hostel", icon: "🏠", description: "Accommodation related" },
-    { value: "Other", icon: "📌", description: "Everything else" },
-  ];
 
   return (
     <div className="submit-container">
@@ -115,41 +104,6 @@ export default function SubmitComplaint() {
               rows="6"
             />
           </div>
-
-          <div className="form-group">
-            <label className="form-label">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
-                <line x1="7" y1="7" x2="7.01" y2="7"/>
-              </svg>
-              Category
-            </label>
-            <div className="category-grid">
-              {categoryOptions.map((option) => (
-                <label
-                  key={option.value}
-                  className={`category-option ${
-                    category === option.value ? "selected" : ""
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="category"
-                    value={option.value}
-                    checked={category === option.value}
-                    onChange={(e) => setCategory(e.target.value)}
-                    className="category-radio"
-                  />
-                  <div className="category-content">
-                    <span className="category-icon">{option.icon}</span>
-                    <span className="category-name">{option.value}</span>
-                  </div>
-                  <span className="category-desc">{option.description}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-
           <div className="form-actions">
             <button
               type="button"

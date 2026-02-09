@@ -1,28 +1,30 @@
 import { useEffect, useMemo, useState } from "react";
-import {
-  getAllComplaints,
-  updateComplaintStatus,
-} from "../services/api";
+import { getAdminComplaints, updateComplaintStatus } from "../services/api";
 import "./AdminDashboard.css";
 
-const STATUS_OPTIONS = ["Pending", "In Progress", "Resolved"];
-
 function statusKey(s) {
-  if (!s) return "pending";
+  if (!s) return "open";
   const k = String(s).toLowerCase();
   if (k.includes("resolv")) return "resolved";
   if (k.includes("progress")) return "in_progress";
-  return "pending";
+  return "open";
+}
+
+function statusLabel(s) {
+  if (!s) return "Open";
+  const k = String(s).toUpperCase();
+  if (k === "IN_PROGRESS") return "In Progress";
+  if (k === "RESOLVED") return "Resolved";
+  return "Open";
 }
 
 export default function AdminDashboard() {
   const [complaints, setComplaints] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState("all");
-  const [remarksMap, setRemarksMap] = useState({});
   const [updatingMap, setUpdatingMap] = useState({});
-  const [disabledMap, setDisabledMap] = useState({});
 
   useEffect(() => {
     fetchComplaints();
@@ -30,11 +32,12 @@ export default function AdminDashboard() {
 
   const fetchComplaints = async () => {
     setLoading(true);
+    setError("");
     try {
-      const res = await getAllComplaints();
+      const res = await getAdminComplaints();
       setComplaints(res.data || []);
     } catch (error) {
-      setMessage("❌ Failed to load complaints");
+      setError("Failed to load complaints.");
     } finally {
       setLoading(false);
     }
@@ -49,16 +52,15 @@ export default function AdminDashboard() {
       if (!q) return true;
       return (
         String(c.title || "").toLowerCase().includes(q) ||
-        String(c.description || "").toLowerCase().includes(q) ||
-        String(c.category || "").toLowerCase().includes(q)
+        String(c.description || "").toLowerCase().includes(q)
       );
     });
   }, [complaints, query, filter]);
 
-  const handleUpdate = async (id, status, remarks) => {
+  const handleUpdate = async (id, status) => {
     setUpdatingMap((m) => ({ ...m, [id]: true }));
     try {
-      await updateComplaintStatus(id, status, remarks);
+      await updateComplaintStatus(id, status);
       await fetchComplaints();
     } catch (error) {
       console.error("Admin update error:", error);
@@ -72,9 +74,7 @@ export default function AdminDashboard() {
       `Mark complaint "${complaint.title}" as resolved?`
     );
     if (!confirmed) return;
-    const remarks = remarksMap[complaint.id] || complaint.remarks || "";
-    setDisabledMap((m) => ({ ...m, [complaint.id]: true }));
-    await handleUpdate(complaint.id, "RESOLVED", remarks);
+    await handleUpdate(complaint.id, "RESOLVED");
   };
 
   return (
@@ -94,7 +94,7 @@ export default function AdminDashboard() {
             className="filter-select"
           >
             <option value="all">All</option>
-            <option value="pending">Pending</option>
+            <option value="open">Open</option>
             <option value="in_progress">In Progress</option>
             <option value="resolved">Resolved</option>
           </select>
@@ -104,6 +104,7 @@ export default function AdminDashboard() {
         </div>
       </div>
 
+      {error && <div className="center error-message">{error}</div>}
       {loading ? (
         <div className="center">Loading complaints...</div>
       ) : filtered.length === 0 ? (
@@ -116,43 +117,23 @@ export default function AdminDashboard() {
                 <div>
                   <h3 className="card-title">{c.title}</h3>
                   <div className="meta">
-                    <span className="category">{c.category || "General"}</span>
                     <span className="date">{new Date(c.createdAt || Date.now()).toLocaleString()}</span>
                   </div>
                 </div>
                 <div className={`status-badge ${statusKey(c.status)}`}>
-                  {String(c.status || "Pending")}
+                  {statusLabel(c.status)}
                 </div>
               </div>
 
               <p className="card-desc">{c.description}</p>
 
               <div className="card-actions">
-                <select
-                  value={c.status || "Pending"}
-                  disabled
-                >
-                  {STATUS_OPTIONS.map((s) => (
-                    <option key={s} value={s}>
-                      {s}
-                    </option>
-                  ))}
-                </select>
-
-                <input
-                  className="remarks-input"
-                  placeholder="Admin remarks"
-                  value={remarksMap[c.id] ?? c.remarks ?? ""}
-                  onChange={(e) => setRemarksMap((m) => ({ ...m, [c.id]: e.target.value }))}
-                  disabled={statusKey(c.status) === "resolved" || !!disabledMap[c.id]}
-                />
-
                 <button
                   className="resolve-btn"
                   onClick={() => handleResolve(c)}
-                  disabled={statusKey(c.status) === "resolved" || !!updatingMap[c.id] || !!disabledMap[c.id]}
+                  disabled={statusKey(c.status) === "resolved" || !!updatingMap[c.id]}
                 >
-                  {updatingMap[c.id] ? "Resolving..." : statusKey(c.status) === "resolved" || disabledMap[c.id] ? "Resolved" : "Resolve"}
+                  {updatingMap[c.id] ? "Resolving..." : statusKey(c.status) === "resolved" ? "Resolved" : "Resolve"}
                 </button>
               </div>
             </div>

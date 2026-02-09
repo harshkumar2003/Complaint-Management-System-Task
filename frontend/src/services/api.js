@@ -1,103 +1,78 @@
 import axios from "axios";
 
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || "/api/v1";
+
 const api = axios.create({
-  baseURL: "http://localhost:8080", // change after deployment
+  baseURL: apiBaseUrl, // change after deployment
   headers: {
     "Content-Type": "application/json",
   },
   timeout: 10000,
 });
 
-// Local fallback key
-const MOCK_KEY = "mock_complaints";
-
-function loadMockComplaints() {
-  try {
-    const raw = localStorage.getItem(MOCK_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch (e) {
-    return [];
-  }
-}
-
-function saveMockComplaints(list) {
-  try {
-    localStorage.setItem(MOCK_KEY, JSON.stringify(list));
-  } catch (e) {
-    console.warn("Failed saving mock complaints", e);
-  }
-}
-
-function saveMockComplaint(c) {
-  const list = loadMockComplaints();
-  list.unshift(c);
-  saveMockComplaints(list);
-}
-
-// ---------- Complaint APIs (with local fallback) ----------
+// ---------- Complaint APIs ----------
 
 export const createComplaint = async (complaintData) => {
-  try {
-    const res = await api.post("/complaints", complaintData);
-    return res;
-  } catch (err) {
-    // fallback: save to localStorage and return a mock response
-    console.warn("API unavailable, saving complaint to local mock storage", err?.message || err);
-    const mock = {
-      id: `mock-${Date.now()}`,
-      title: complaintData.title,
-      description: complaintData.description,
-      category: complaintData.category || "General",
-      status: "Pending",
-      createdAt: new Date().toISOString(),
-    };
-    saveMockComplaint(mock);
-    return Promise.resolve({ data: mock });
-  }
+  const res = await api.post("/complaints", complaintData);
+  return res;
 };
 
-export const getAllComplaints = async () => {
-  try {
-    const res = await api.get("/complaints");
-    return res;
-  } catch (err) {
-    console.warn("API unavailable, returning mock complaints", err?.message || err);
-    const data = loadMockComplaints();
-    return Promise.resolve({ data });
-  }
+export const getMyComplaints = async () => {
+  const res = await api.get("/complaints/user");
+  return res;
 };
 
-export const getComplaintById = async (id) => {
+export const getAdminComplaints = async () => {
+  const res = await api.get("/admin/complaints");
+  return res;
+};
+
+export const updateComplaintStatus = async (id, status) => {
+  const res = await api.put(`/admin/complaints/${id}/status`, {
+    status,
+  });
+  return res;
+};
+
+// -------------------- Auth APIs --------------------
+export const authRegister = async (registerData) => {
   try {
-    const res = await api.get(`/complaints/${id}`);
+    const res = await api.post("/auth/register", registerData);
     return res;
   } catch (err) {
-    const list = loadMockComplaints();
-    const found = list.find((c) => String(c.id) === String(id));
-    if (found) return Promise.resolve({ data: found });
     return Promise.reject(err);
   }
 };
 
-export const updateComplaintStatus = async (id, status, remarks) => {
+export const authLogin = async (loginData) => {
   try {
-    const res = await api.put(`/complaints/${id}/status`, {
-      status,
-      remarks,
-    });
-    return res;
-  } catch (err) {
-    // update mock if present
-    const list = loadMockComplaints();
-    const idx = list.findIndex((c) => String(c.id) === String(id));
-    if (idx > -1) {
-      list[idx].status = status;
-      list[idx].remarks = remarks;
-      saveMockComplaints(list);
-      return Promise.resolve({ data: list[idx] });
+    const res = await api.post("/auth/login", loginData);
+    const data = res.data;
+    if (data?.token) {
+      localStorage.setItem("token", data.token);
     }
+    if (data?.role) {
+      localStorage.setItem("role", data.role);
+    }
+    if (data?.id) {
+      localStorage.setItem("userId", data.id);
+    }
+    // set axios default header
+    if (data?.token) api.defaults.headers.common["Authorization"] = `Bearer ${data.token}`;
+    return res;
+  } catch (err) {
     return Promise.reject(err);
   }
 };
+
+// attach token from localStorage on each request if present
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    config.headers = config.headers || {};
+    config.headers["Authorization"] = `Bearer ${token}`;
+  }
+  return config;
+});
 
 export default api;

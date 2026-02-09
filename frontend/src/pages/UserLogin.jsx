@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { authLogin } from "../services/api";
 import "./UserLogin.css";
 
 export default function UserLogin() {
@@ -18,17 +19,14 @@ export default function UserLogin() {
     setLoading(true);
 
     try {
-      // TODO: Replace with actual API call
-      // For now, simulate login
-      await new Promise((resolve) => setTimeout(resolve, 800));
-      
-      localStorage.setItem("role", "USER");
+      const res = await authLogin({ email, password });
       setMessage("Login successful!");
-      
+      // navigation after a short delay to show message
       setTimeout(() => {
         navigate("/complaints");
       }, 500);
     } catch (err) {
+      console.error(err);
       setError("Invalid email or password. Please try again.");
     } finally {
       setLoading(false);
